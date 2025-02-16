@@ -1,6 +1,5 @@
 """AIチャット"""
 
-import asyncio
 from logging import INFO, basicConfig, getLogger
 from math import acos, cos, radians, sin
 
@@ -58,7 +57,6 @@ async def send(agent: Agent, message_container: ui.column, text: ui.input) -> No
         ui.chat_message(text=question, name="You", sent=True)
         response_message = ui.chat_message(name="Bot", sent=False)
         spinner = ui.spinner(type="dots")
-        asyncio.sleep(0)
     ui.run_javascript("window.scrollTo(0, document.body.scrollHeight)")
     try:
         # tool利用時は、結果が空になることがあるためrun_streamは使えない
