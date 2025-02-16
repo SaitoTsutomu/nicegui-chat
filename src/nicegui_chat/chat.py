@@ -4,7 +4,7 @@ from logging import INFO, basicConfig, getLogger
 from math import acos, cos, radians, sin
 
 import jageocoder
-from nicegui import ui
+from nicegui import events, ui
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.models.openai import OpenAIModel
@@ -43,14 +43,15 @@ def calc_distance(_ctx: RunContext[None], from_: str, to: str) -> float:
     return distance(from_y, from_x, to_y, to_x)
 
 
-async def send(agent: Agent, message_container: ui.column, text: ui.input) -> None:
+async def send(event: events.GenericEventArguments, agent: Agent, message_container: ui.column, text: ui.input) -> None:
     """質問に回答
 
     :param agent: エージェント
     :param message_container: 親コンテナ(UI)
     :param text: 入力(UI)
     """
-    if not (question := text.value):
+    # IME確定または空文字列
+    if event.args.get("isComposing") or not (question := text.value):
         return
     text.value = ""
     with message_container:
@@ -89,7 +90,7 @@ def main(*, reload: bool = False, port: int = 8106) -> None:
     message_container = ui.column().classes("w-full max-w-2xl mx-auto items-stretch")
     with ui.footer().classes("bg-white"), ui.column().classes("w-full max-w-3xl mx-auto my-6"):
         text = ui.input(placeholder="メッセージ").props("rounded outlined input-class=mx-3").classes("w-full")
-        text.on("keydown.enter", lambda: send(agent, message_container, text))
+        text.on("keydown.enter", lambda event: send(event, agent, message_container, text))
     # 入力欄にカーソルを表示
     ui.timer(0.1, lambda: ui.run_javascript('document.querySelector("input").focus()'), once=True)
     ui.run(title="Chat", reload=reload, port=port)
