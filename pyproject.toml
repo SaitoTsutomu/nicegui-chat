@@ -3,13 +3,14 @@ authors = [
   {name = "Saito Tsutomu", email = "tsutomu7@hotmail.co.jp"},
 ]
 dependencies = [
+  "jageocoder>=2.1.8",
   "nicegui>=2.11.1",
   "pydantic-ai>=0.0.24",
 ]
-description = "Simple Chat with AI"
+description = "Chat with AI"
 name = "nicegui-chat"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 version = "0.1.0"
 
 [project.urls]
@@ -39,6 +40,7 @@ ignore = [
   "D213",
   "DOC201",
   "DOC402",
+  "DOC501",
   "E501",
 ]
 preview = true
