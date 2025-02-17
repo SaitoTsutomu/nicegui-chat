@@ -5,7 +5,7 @@ from math import acos, cos, radians, sin
 
 import jageocoder
 from nicegui import events, ui
-from openai import BadRequestError
+from openai import APIConnectionError, BadRequestError
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.models.openai import OpenAIModel
@@ -64,7 +64,7 @@ async def send(event: events.GenericEventArguments, agent: Agent, message_contai
         # tool利用時は、結果が空になることがあるためrun_streamは使えない
         message = await agent.run(question)
         content = message.data
-    except (AgentRunError, BadRequestError, jageocoder.exceptions.RemoteTreeException) as e:
+    except (AgentRunError, APIConnectionError, BadRequestError, jageocoder.exceptions.RemoteTreeException) as e:
         content = str(e)
     finally:
         with response_message:
@@ -83,9 +83,11 @@ def main(*, reload: bool = False, port: int = 8106) -> None:
         OpenAIModel("llama3.2", base_url="http://localhost:11434/v1", api_key="_"),
         system_prompt=(
             # "Be concise, reply with one sentence.To get distance from two addresses, use the calc_distance tool."
-            "日本の2つの住所間の距離は、toolを使うこと。引数の住所は、入力値をそのまま使うこと。"
+            # "日本の2つの住所間の距離は、toolのcalc_distanceを使うこと。引数の住所は、入力値をそのまま使うこと。"
+            "For the distance between two addresses in Japan, use calc_distance tool. For the argument address, use the input value as it is."
         ),
         tools=[calc_distance],
+        model_settings={"temperature": 0.8},
     )
     # UI
     message_container = ui.column().classes("w-full max-w-2xl mx-auto items-stretch")
