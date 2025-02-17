@@ -5,6 +5,7 @@ from math import acos, cos, radians, sin
 
 import jageocoder
 from nicegui import events, ui
+from openai import BadRequestError
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.models.openai import OpenAIModel
@@ -63,7 +64,7 @@ async def send(event: events.GenericEventArguments, agent: Agent, message_contai
         # tool利用時は、結果が空になることがあるためrun_streamは使えない
         message = await agent.run(question)
         content = message.data
-    except (AgentRunError, jageocoder.exceptions.RemoteTreeException) as e:
+    except (AgentRunError, BadRequestError, jageocoder.exceptions.RemoteTreeException) as e:
         content = str(e)
     finally:
         with response_message:
