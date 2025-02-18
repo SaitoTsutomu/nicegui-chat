@@ -3,6 +3,7 @@ authors = [
   {name = "Saito Tsutomu", email = "tsutomu7@hotmail.co.jp"},
 ]
 dependencies = [
+  "fire>=0.7.0",
   "jageocoder>=2.1.8",
   "nicegui>=2.11.1",
   "pydantic-ai>=0.0.24",

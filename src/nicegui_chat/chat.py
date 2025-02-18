@@ -73,18 +73,18 @@ async def send(event: events.GenericEventArguments, agent: Agent, message_contai
         message_container.remove(spinner)
 
 
-def main(*, reload: bool = False, port: int = 8106) -> None:
+def chat(model: str = "llama3.2", *, port: int | None = None) -> None:
     """メイン"""
     basicConfig(level=INFO, format="%(message)s")
     # jageocoderの設定
     jageocoder.init(url="http://localhost:5000/jsonrpc")
     # モデルとしてOllamaを利用
     agent = Agent(
-        OpenAIModel("llama3.2", base_url="http://localhost:11434/v1", api_key="_"),
+        OpenAIModel(model, base_url="http://localhost:11434/v1", api_key="_"),
         system_prompt=(
-            # "Be concise, reply with one sentence.To get distance from two addresses, use the calc_distance tool."
-            # "日本の2つの住所間の距離は、toolのcalc_distanceを使うこと。引数の住所は、入力値をそのまま使うこと。"
-            "For the distance between two addresses in Japan, use calc_distance tool. For the argument address, use the input value as it is."
+            "Be concise, reply with one sentence.",
+            "For the distance between two addresses in Japan, use calc_distance tool.",
+            "For the argument address, use the input value as it is.",
         ),
         tools=[calc_distance],
         model_settings={"temperature": 0.8},
@@ -96,4 +96,4 @@ def main(*, reload: bool = False, port: int = 8106) -> None:
         text.on("keydown.enter", lambda event: send(event, agent, message_container, text))
     # 入力欄にカーソルを表示
     ui.timer(0.1, lambda: ui.run_javascript('document.querySelector("input").focus()'), once=True)
-    ui.run(title="Chat", reload=reload, port=port)
+    ui.run(title="Chat", reload=False, port=port)
