@@ -23,11 +23,11 @@ def test_send() -> None:
     event.args.get.return_value = False  # IMEの確定でないことを設定
     agent = Agent(TestModel(custom_result_text=answer))
     message_container = ui.column()
-    input_ = ui.input(value=question)
+    text = ui.textarea(value=question)
 
     # act
     with patch("nicegui.ui.run_javascript"):  # run_javascriptの無効化
-        asyncio.run(send(event, agent, message_container, input_))
+        asyncio.run(send(event, agent, message_container, text))
 
     # assert
     expected = dedent(f"""\

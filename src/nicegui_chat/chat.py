@@ -44,15 +44,21 @@ def calc_distance(_ctx: RunContext[None], from_: str, to: str) -> float:
     return distance(from_y, from_x, to_y, to_x)
 
 
-async def send(event: events.GenericEventArguments, agent: Agent, message_container: ui.column, text: ui.input) -> None:
+async def send(
+    event: events.GenericEventArguments,
+    agent: Agent,
+    message_container: ui.column,
+    text: ui.textarea,
+) -> None:
     """質問に回答
 
+    :param event: イベント
     :param agent: エージェント
     :param message_container: 親コンテナ(UI)
     :param text: 入力(UI)
     """
-    # IME確定または空文字列
-    if event.args.get("isComposing") or not (question := text.value):
+    # シフトキー、IME確定、または空文字列
+    if event.args.get("shiftKey") or event.args.get("isComposing") or not (question := text.value):
         return
     text.value = ""
     with message_container:
@@ -63,7 +69,7 @@ async def send(event: events.GenericEventArguments, agent: Agent, message_contai
     try:
         # tool利用時は、結果が空になることがあるためrun_streamは使えない
         message = await agent.run(question)
-        content = message.data
+        content = str(message.data)
     except (AgentRunError, APIConnectionError, BadRequestError, jageocoder.exceptions.RemoteTreeException) as e:
         content = str(e)
     finally:
@@ -92,8 +98,8 @@ def chat(model: str = "llama3.2", *, port: int | None = None) -> None:
     # UI
     message_container = ui.column().classes("w-full max-w-2xl mx-auto items-stretch")
     with ui.footer().classes("bg-white"), ui.column().classes("w-full max-w-3xl mx-auto my-6"):
-        text = ui.input(placeholder="メッセージ").props("rounded outlined input-class=mx-3").classes("w-full")
+        text = ui.textarea(placeholder="メッセージ").props("rounded outlined input-class=mx-3").classes("w-full")
         text.on("keydown.enter", lambda event: send(event, agent, message_container, text))
     # 入力欄にカーソルを表示
-    ui.timer(0.1, lambda: ui.run_javascript('document.querySelector("input").focus()'), once=True)
+    ui.timer(0.2, lambda: ui.run_javascript('document.querySelector("textarea").focus()'), once=True)
     ui.run(title="Chat", reload=False, port=port)
