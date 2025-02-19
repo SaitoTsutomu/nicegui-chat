@@ -24,20 +24,19 @@ def distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 def calc_distance(_ctx: RunContext[None], from_: str, to: str) -> float:
     """2つの住所間の距離"""
-    func_msg = f"calc_distance({from_}, {to})"
-    if not from_ or not to:
-        msg = f"{func_msg}: 引数が空"
-        raise AgentRunError(msg)
     logger.info("calc_distance: %s %s", from_, to)
+    if not from_ or not to:
+        msg = "引数が空"
+        raise AgentRunError(msg)
     results = jageocoder.search(from_)
     if not results["matched"]:
-        msg = f"{func_msg}: from_の結果なし"
+        msg = "from_の結果なし"
         raise AgentRunError(msg)
     location = results["candidates"][0]
     from_x, from_y = location["x"], location["y"]
     results = jageocoder.search(to)
     if not results["matched"]:
-        msg = f"{func_msg}: toの結果なし"
+        msg = "toの結果なし"
         raise AgentRunError(msg)
     location = results["candidates"][0]
     to_x, to_y = location["x"], location["y"]
@@ -81,7 +80,7 @@ async def send(
 
 def chat(model: str = "llama3.2", *, port: int | None = None) -> None:
     """メイン"""
-    basicConfig(level=INFO, format="%(message)s")
+    basicConfig(level=INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     # jageocoderの設定
     jageocoder.init(url="http://localhost:5000/jsonrpc")
     # モデルとしてOllamaを利用
