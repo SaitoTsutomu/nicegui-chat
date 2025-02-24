@@ -18,13 +18,13 @@ def distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6371
     ry1, rx1, ry2, rx2 = radians(lat1), radians(lon1), radians(lat2), radians(lon2)
     distance = r * acos(sin(ry1) * sin(ry2) + cos(ry1) * cos(ry2) * cos(rx1 - rx2))
-    logger.info("distance: %s %s %s %s %f", lat1, lon1, lat2, lon2, distance)
+    logger.info("\033[32mdistance\033[0m: %s %s %s %s %f", lat1, lon1, lat2, lon2, distance)
     return distance
 
 
 def calc_distance(_ctx: RunContext[None], from_: str, to: str) -> float:
     """2つの住所間の距離"""
-    logger.info("calc_distance: %s %s", from_, to)
+    logger.info("\033[32mcalc_distance\033[0m: %s %s", from_, to)
     if not from_ or not to:
         msg = "引数が空"
         raise AgentRunError(msg)
