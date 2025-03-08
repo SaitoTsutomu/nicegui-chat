@@ -4,8 +4,9 @@ from logging import INFO, basicConfig, getLogger
 from math import acos, cos, radians, sin
 
 import jageocoder
+import urllib3
 from nicegui import events, ui
-from openai import APIConnectionError, BadRequestError
+from openai import APIConnectionError, BadRequestError, NotFoundError
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.models.openai import OpenAIModel
@@ -69,7 +70,14 @@ async def send(
         # tool利用時は、結果が空になることがあるためrun_streamは使えない
         message = await agent.run(question)
         content = str(message.data)
-    except (AgentRunError, APIConnectionError, BadRequestError, jageocoder.exceptions.RemoteTreeException) as e:
+    except (
+        AgentRunError,
+        APIConnectionError,
+        BadRequestError,
+        jageocoder.exceptions.RemoteTreeException,
+        urllib3.exceptions.MaxRetryError,
+        NotFoundError,
+    ) as e:
         content = str(e)
     finally:
         with response_message:
